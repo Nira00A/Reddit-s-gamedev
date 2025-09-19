@@ -1,0 +1,5 @@
+name: my-devvit-app
+entrypoint: ./main.tsx     # or your devvit entry file path
+description: 'Pixel art puzzle game in Devvit'
+version: 0.1.0
+type: custom
