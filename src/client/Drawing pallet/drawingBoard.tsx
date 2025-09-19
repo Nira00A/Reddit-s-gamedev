@@ -5,9 +5,10 @@ import { useGlobal } from "../hooks/globals";
 
 interface DisplayBoardProps {
   goToPage: (page: string) => void; // Function prop to navigate pages
+  onCreatePuzzle?: (pixelData: string[][]) => void;
 }
 
-export function DisplayBoard({ goToPage }: DisplayBoardProps) {
+export function DisplayBoard({ goToPage , onCreatePuzzle}: DisplayBoardProps) {
   const [boardWidth, setBoardWidth] = useState<number>(16);
   const [boardHeight, setBoardHeight] = useState<number>(16);
   const [currentColor, setCurrentColor] = useState<string>("#fff");
@@ -15,6 +16,13 @@ export function DisplayBoard({ goToPage }: DisplayBoardProps) {
   const { setExportedImg } = useGlobal();
   const [time, setTime] = useState<number>(0);
   const [timerActive, setTimerActive] = useState<boolean>(true);
+  const [currentPixelData, setCurrentPixelData] = useState<string[][]>(
+  Array(boardHeight).fill(null).map(() => Array(boardWidth).fill("#fff"))
+);
+  const [pixelData, setPixelData] = useState<string[]>(
+    new Array(boardWidth * boardHeight).fill("#fff")
+  );
+
 
   useEffect(() => {
     if (!timerActive) return;
@@ -94,8 +102,18 @@ export function DisplayBoard({ goToPage }: DisplayBoardProps) {
               width={boardWidth}
               selectedColor={currentColor}
               setSelectedColor={setCurrentColor}
+              pixelData={pixelData}
+              setPixelData={setPixelData}
             />
           </div>
+
+          <button
+            onClick={() => onCreatePuzzle && onCreatePuzzle(currentPixelData)}
+            className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded transition-colors"
+          >
+            🧩 Create Puzzle Challenge
+          </button>
+
 
           <div className="text-xs text-center text-red-500 font-retro">
             Note: Maximum time is 60 seconds to draw.

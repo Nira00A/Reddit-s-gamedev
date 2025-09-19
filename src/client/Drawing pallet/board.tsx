@@ -6,6 +6,8 @@ interface BoardProps {
   selectedColor: string;
   setSelectedColor: (color: string) => void;
   goTo?: (page: string) => void;
+  pixelData: string[];              
+  setPixelData: (p: string[]) => void;
 }
 
 export const Board: React.FC<BoardProps> = ({
@@ -14,9 +16,10 @@ export const Board: React.FC<BoardProps> = ({
   selectedColor,
   setSelectedColor,
   goTo,
+  pixelData,
+  setPixelData,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
-  const [pixels, setPixels] = useState<string[]>(new Array(height * width).fill("#fff"));
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -33,11 +36,11 @@ export const Board: React.FC<BoardProps> = ({
       pixel.push(
         <Pixel
           key={index}
-          color={pixels[index] ?? "#fff"} // pass individual pixel color, fallback to "#fff"
+          color={pixelData[index] ?? "#fff"} // pass individual pixel color, fallback to "#fff"
           setColor={(newColor: string) => {
-            const newPixels = [...pixels];
+            const newPixels = [...pixelData];
             newPixels[index] = newColor;
-            setPixels(newPixels);
+            setPixelData(newPixels);
           }}
           selectedColor={selectedColor}
           isDragging={isDragging}
@@ -48,7 +51,7 @@ export const Board: React.FC<BoardProps> = ({
   }
 
   function handleDelete() {
-    setPixels(new Array(height * width).fill("#fff"));
+    setPixelData(new Array(height * width).fill("#fff"));
   }
 
   function handleEraser() {

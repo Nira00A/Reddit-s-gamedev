@@ -137,6 +137,48 @@ export const ImagePuzzle: React.FC<ImagePuzzle> = ({ goToPage }) => {
     setIsComplete(grid.every((p, i) => p?.correctPosition === i));
   };
 
+ const postShuffledPuzzle = async () => {
+  if (puzzleGrid.some(p => p === null)) {
+    console.error('Cannot post—puzzle still loading.');
+    return;
+  }
+
+  const piecesPayload = puzzleGrid.map(p => ({
+    src: (p as PuzzlePiece).src,
+    correctPosition: (p as PuzzlePiece).correctPosition,
+  }));
+
+  const payload = {
+    puzzleId: `puzzle_${Date.now()}_${Math.random().toString(36).slice(2,9)}`,
+    title: 'Untitled Puzzle',
+    difficulty: 'Easy',
+    pieces: piecesPayload,
+  };
+
+  console.log('Posting puzzle challenge payload:', payload);
+
+  try {
+    const res = await fetch('/api/create-puzzle-challenge', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    const json = await res.json();
+
+    if (json.success) {
+      console.log(`Puzzle posted successfully! View at: ${json.postUrl}`);
+      goToPage('home');
+    } else {
+      console.error(`Error posting puzzle: ${json.message}`);
+    }
+  } catch (error) {
+    console.error('Network or server error:', error);
+  }
+};
+
+
+
   const resetPuzzle = () => {
     setPuzzleGrid((prev) => [...prev].sort(() => Math.random() - 0.5));
     setIsComplete(false);
@@ -202,7 +244,14 @@ export const ImagePuzzle: React.FC<ImagePuzzle> = ({ goToPage }) => {
         Drag any piece onto another piece to swap positions
       </p>
 
-      <div className="text-retro">Info</div>
+      <button
+        onClick={postShuffledPuzzle}
+        className="mt-6 px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded"
+      >
+        📤 Post This Puzzle Challenge
+      </button>
+
+      
     </div>
   );
 };
